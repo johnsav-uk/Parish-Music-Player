@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parish Music Player</title>
+<link rel="icon" href="logo.png">
+<link rel="stylesheet" href="css/app.css">
+<script>
+  /* The saved scheme is applied before the first paint. Reading it here rather
+     than from the module that owns settings costs a duplicated key name, and
+     buys a player that never flashes white on its way to blue while the
+     modules load. A failure is silently the default, which is white. */
+  try {
+    /* The launcher's settings file first: localStorage starts empty on every
+       launch, because each launch gets a new port. See settings.js. */
+    var saved = null;
+    try {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'settings', false);
+      xhr.send();
+      if (xhr.status === 200) saved = JSON.parse(xhr.responseText);
+    } catch (e) {}
+    if (!saved || !saved.theme) saved = JSON.parse(localStorage.getItem('parish-music-player/settings/v4') || '{}');
+    if (saved.theme) document.documentElement.dataset.theme = saved.theme;
+    if (saved.layout) document.documentElement.dataset.layout = saved.layout;
+  } catch (e) {}
+</script>
+</head>
+<body>
+
+<header class="app-header">
+  <img src="logo.png" alt="" class="app-logo">
+  <h1 class="app-title">Parish Music Player</h1>
+  <nav class="tabs" role="tablist">
+    <button class="tab" id="tabPlayer" role="tab" aria-controls="panelPlayer" aria-selected="true">Player</button>
+    <button class="tab" id="tabSetup"  role="tab" aria-controls="panelSetup"  aria-selected="false">Setup</button>
+  </nav>
+</header>
+
+<!-- ─────────────────────────── PLAYER ─────────────────────────── -->
+<main id="panelPlayer" role="tabpanel" aria-labelledby="tabPlayer">
+
+  <section class="section">
+    <div class="playlist-head">
+      <h2 class="label">Service music</h2>
+      <label class="upload-btn" for="fileIn">+ Load files</label>
+      <input type="file" id="fileIn" multiple accept="audio/*,.mid,.midi">
+    </div>
+    <div class="playlist-box" id="playlist"></div>
+  </section>
+
+  <section class="section">
+    <div class="track-display">
+      <h2 class="label">Now playing</h2>
+      <div class="track-now" id="nowPlaying">—</div>
+      <div class="seek" id="seek" title="Click or drag to move to another point in the track">
+        <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+      </div>
+      <div class="time-row" aria-live="off">
+        <span id="tElapsed">0:00</span>
+        <span id="tCue" class="time-cue"></span>
+        <span id="tTotal">0:00</span>
+      </div>
+      <div class="tempo-live" id="tempoLive" hidden>
+        <span class="tempo-live-label">Tempo</span>
+        <button type="button" class="tempo-btn" id="tempoDown" tabindex="-1"
+                title="Slower (hold to keep going)" aria-label="Slower">&minus;</button>
+        <span class="tempo-val" id="tempoVal">100%</span>
+        <button type="button" class="tempo-btn" id="tempoUp" tabindex="-1"
+                title="Faster (hold to keep going)" aria-label="Faster">+</button>
+        <span class="tempo-note">Remembered for this hymn</span>
+      </div>
+      <div class="vol-bar"><div class="vol-fill" id="vFill"></div></div>
+      <span class="status-pill s-empty" id="pill">No music loaded</span>
+      <div class="track-next-label">Up next</div>
+      <div class="track-next-name" id="nextTrack">—</div>
+    </div>
+  </section>
+
+  <button class="big-btn" id="mainBtn" type="button">&#9654; Play</button>
+  <div class="hold-bar-wrap"><div class="hold-bar" id="holdBar"></div></div>
+
+  <p class="hint hint-quiet">
+    Press to play &nbsp;·&nbsp; press twice to fade out &nbsp;·&nbsp; Esc to stop
+  </p>
+
+  <section class="section" id="secSound">
+    <h2 class="label">Sound</h2>
+    <div class="settings-card">
+      <div class="settings-row">
+        <label for="masterVol">Master volume</label>
+        <input type="range" id="masterVol" min="0" max="1" step="0.01">
+        <span id="masterVolVal">100%</span>
+      </div>
+      <div class="settings-row">
+        <label for="fadeDur">Fade length</label>
+        <input type="range" id="fadeDur" min="1" max="10" step="0.5">
+        <span id="fadeDurVal">3.0s</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="secMidi">
+    <h2 class="label">MIDI instruments</h2>
+    <div class="settings-card">
+      <div class="settings-row">
+        <label for="midiInst">Default instrument</label>
+        <select id="midiInst"></select>
+        <span class="settings-note">Used for newly loaded MIDI files. Change any single track from the playlist.</span>
+      </div>
+      <div class="settings-row">
+        <label for="reverbAmount">Church acoustic</label>
+        <input type="range" id="reverbAmount" min="0" max="1" step="0.02">
+        <span id="reverbAmountVal">38%</span>
+      </div>
+
+      <div class="settings-row">
+        <label for="reverbSeconds">Acoustic size</label>
+        <input type="range" id="reverbSeconds" min="0.6" max="5" step="0.1">
+        <span id="reverbSecondsVal">2.6s</span>
+      </div>
+
+      <div class="settings-row">
+        <label for="releaseMult">Note release</label>
+        <input type="range" id="releaseMult" min="0.1" max="5" step="0.1">
+        <span id="releaseMultVal">2.0x</span>
+      </div>
+      <div class="settings-row">
+        <label for="sustainLoop">Sustain long notes</label>
+        <input type="checkbox" id="sustainLoop">
+        <span class="settings-note">Holds notes past the end of the recording. Suits organ; turn off for piano.</span>
+      </div>
+      <div class="settings-row">
+        <label for="dropPercussion">Ignore drum track</label>
+        <input type="checkbox" id="dropPercussion">
+        <span class="settings-note">Skips MIDI channel 10 so drum parts are not played as organ notes.</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ─────────────────────────── SETUP ─────────────────────────── -->
+<main id="panelSetup" role="tabpanel" aria-labelledby="tabSetup" hidden>
+
+  <p class="setup-intro">
+    These settings are saved and restored automatically. They should not need
+    changing once the player is set up for your church.
+  </p>
+
+  <section class="section">
+    <h2 class="label">Appearance</h2>
+    <div class="settings-card">
+      <div class="settings-row">
+        <label id="schemeLabel">Colour scheme</label>
+        <div class="scheme-switch" role="group" aria-labelledby="schemeLabel">
+          <button type="button" class="scheme-btn" id="schemeWhite" data-scheme="white"
+                  aria-pressed="true"><span class="scheme-swatch white"></span>White</button>
+          <button type="button" class="scheme-btn" id="schemeParchment" data-scheme="parchment"
+                  aria-pressed="false"><span class="scheme-swatch parchment"></span>Parchment</button>
+          <button type="button" class="scheme-btn" id="schemeBlue" data-scheme="blue"
+                  aria-pressed="false"><span class="scheme-swatch blue"></span>Blue</button>
+        </div>
+      </div>
+      <div class="settings-row">
+        <span class="settings-note">
+          White is the plainest and the easiest to read. Parchment is the same
+          scheme on a warmer, paper-coloured ground. Blue is the original, and
+          is gentlest in a dark church.
+        </span>
+      </div>
+      <div class="settings-row">
+        <label id="layoutLabel">Layout</label>
+        <div class="scheme-switch" role="group" aria-labelledby="layoutLabel">
+          <button type="button" class="scheme-btn" id="layoutWide" data-layout="wide"
+                  aria-pressed="true"><span class="layout-swatch wide"></span>Wide</button>
+          <button type="button" class="scheme-btn" id="layoutAnchored" data-layout="wide-anchored"
+                  aria-pressed="false"><span class="layout-swatch anchored"></span>Anchored</button>
+          <button type="button" class="scheme-btn" id="layoutStandard" data-layout="standard"
+                  aria-pressed="false"><span class="layout-swatch standard"></span>Tall</button>
+        </div>
+      </div>
+      <div class="settings-row">
+        <span class="settings-note">
+          Wide puts the service list beside the Play button and fits a whole
+          service on one screen. Anchored is the same, with the sound controls
+          and one full-width Play button fixed to the bottom of the window, so
+          only the list ever scrolls. Tall is the single narrow column, which
+          suits a small or portrait monitor.
+        </span>
+      </div>
+    </div>
+  </section>
+
+
+
+  <section class="section">
+    <h2 class="label">Clicker and keyboard</h2>
+    <div class="settings-card">
+      <div class="settings-row">
+        <label for="holdThresh">Hold to fade after</label>
+        <input type="range" id="holdThresh" min="300" max="1500" step="100">
+        <span id="holdThreshVal">600ms</span>
+      </div>
+      <div class="settings-row">
+        <label for="mediaKeys">Bluetooth buttons</label>
+        <input type="checkbox" id="mediaKeys">
+        <span class="settings-note">Respond to play, pause and next on Bluetooth remotes and headphones.</span>
+      </div>
+
+      <div class="learn-block">
+        <p class="settings-note">
+          Most clickers already work. If yours does not, teach it here: click
+          Learn, then press the button on your clicker.
+        </p>
+        <div class="learn-row">
+          <span class="learn-label">Play</span>
+          <span class="learn-keys" id="keysPlay">—</span>
+          <button type="button" class="learn-btn" data-learn="trigger">Learn</button>
+        </div>
+        <div class="learn-row">
+          <span class="learn-label">Fade out</span>
+          <span class="learn-keys" id="keysFade">—</span>
+          <button type="button" class="learn-btn" data-learn="fade">Learn</button>
+        </div>
+        <button type="button" class="learn-btn wide" id="resetKeys">Reset to defaults</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="label">Diagnostics</h2>
+    <div class="settings-card">
+      <div class="diag-panel">
+        <div>State: <span id="dState">—</span></div>
+        <div>Audio clock: <span id="dClock">—</span>s</div>
+        <div>Voices live: <span id="dNodes">—</span></div>
+        <div>Notes scheduled: <span id="dSched">—</span> / <span id="dTotal">—</span></div>
+        <div>Notes dropped (late): <span id="dLate">—</span></div>
+        <div>Track gain: <span id="dGain">—</span></div>
+        <div>Measured level: <span id="dRms">—</span></div>
+        <div>Instruments in memory: <span id="dResident">—</span></div>
+      </div>
+    </div>
+    <div class="info-box" id="sfInfo">
+      &#9888; Instrument sounds not found. Check that the <strong>soundfonts</strong> folder sits
+      next to this page and still contains its <strong>.js</strong> files.
+    </div>
+  </section>
+
+</main>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
