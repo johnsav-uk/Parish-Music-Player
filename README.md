@@ -28,10 +28,16 @@ Free for all parishes.
 
 Windows 10 or 11.
 
-1. Download `ParishMusicPlayer-Setup.exe` from the [Releases page](https://github.com/johnsav-uk/Parish-Music-Player/releases).
+1. Download the installer, `ParishMusicPlayer-Setup-<version>.exe`, from the
+   [latest release](https://github.com/johnsav-uk/Parish-Music-Player/releases/latest).
 2. Run it. Windows will show "Windows protected your PC" because the file is not
    signed with a commercial certificate. Click **More info**, then **Run anyway**.
 3. Start the player from the Start menu.
+
+If Windows says it "cannot access the specified device, path or file", the
+download has been blocked rather than damaged: right-click the installer,
+choose **Properties**, tick **Unblock** and click OK. On a managed machine, ask
+whoever looks after it.
 
 No Python, no browser setup and no internet connection are needed after
 installation.
