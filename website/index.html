@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parish Music Player — free music player for churches</title>
+<meta name="description" content="A free music player for parish churches. Hymns, MIDI and recorded music from one playlist, controlled with a single button or a presentation clicker. Play online or install for offline use.">
+<meta property="og:title" content="Parish Music Player">
+<meta property="og:description" content="Free, one-button music player for parish churches. Play online or install for offline use.">
+<meta property="og:image" content="img/logo.png">
+<meta name="theme-color" content="#f3eee2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1220" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://www.johnsav.co.uk/parishmusicplayer/">
+<link rel="icon" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Inter:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="brand" href="#top" aria-label="Parish Music Player, home">
+      <img src="img/logo.png" alt="" width="40" height="40">
+      <span>Parish Music Player</span>
+    </a>
+    <nav class="site-nav" aria-label="Sections">
+      <a href="#get-it">Get it</a>
+      <a href="#how">How it works</a>
+      <a href="#music">Hymn music</a>
+      <a href="#feedback">Feedback</a>
+      <a href="#support">Support</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ───────────── Hero ───────────── -->
+  <section class="hero" id="top">
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <p class="eyebrow">Free for every parish</p>
+        <h1>Music for the service, at the press of one button</h1>
+        <p class="lede">
+          Hymns, MIDI and recorded music in one playlist, played and faded
+          from a single button or a presentation clicker. Made so that
+          whoever is on the rota this Sunday can run the music without a
+          second thought.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="play/">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+            Open the player
+          </a>
+          <a class="btn btn-secondary js-installer" href="https://github.com/johnsav-uk/Parish-Music-Player/releases/latest">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0-4.5-4.5M12 14l4.5-4.5M4 17v3h16v-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Download for Windows
+          </a>
+        </div>
+        <p class="assurance">No subscriptions, no adverts, no accounts, no data collected.</p>
+      </div>
+      <div class="hero-art">
+        <img src="img/logo.png" alt="Parish Music Player logo: a stained-glass rose window with a play symbol" width="256" height="256">
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── Two ways to use it ───────────── -->
+  <section class="section" id="get-it">
+    <div class="wrap">
+      <h2 class="section-title">Two ways to use it</h2>
+      <p class="section-intro">The same player either way. Choose whichever suits your church.</p>
+
+      <div class="choice-grid">
+        <article class="card choice">
+          <p class="card-kicker">With internet</p>
+          <h3>Play online</h3>
+          <p>Open it in your browser and load your music straight away. Nothing to install.</p>
+          <ul class="ticks">
+            <li>Works in Chrome, Edge or Firefox on a laptop or desktop</li>
+            <li>Your music files stay on your computer. They are never uploaded</li>
+            <li>Settings are remembered in that browser</li>
+            <li>The instruments download the first time (about 55&nbsp;MB), so try it before the service</li>
+          </ul>
+          <a class="btn btn-primary btn-block" href="play/">Open the player</a>
+        </article>
+
+        <article class="card choice">
+          <p class="card-kicker">No internet in church</p>
+          <h3>Install on Windows</h3>
+          <p>Install it once while you have a connection, then it runs entirely offline.</p>
+          <ul class="ticks">
+            <li>Windows 10 or 11</li>
+            <li>Everything is included: all nineteen instruments and the pipe organ</li>
+            <li>Runs in its own window, starting from the Start menu</li>
+            <li>Settings kept between services</li>
+          </ul>
+          <a class="btn btn-secondary btn-block js-installer" href="https://github.com/johnsav-uk/Parish-Music-Player/releases/latest">Download the installer</a>
+          <p class="fine js-installer-meta">Latest version from GitHub.</p>
+        </article>
+      </div>
+
+      <details class="note">
+        <summary>Windows says “Windows protected your PC”</summary>
+        <p>
+          The installer is not signed with a paid commercial certificate, so
+          Windows is cautious about it. Click <strong>More info</strong>, then
+          <strong>Run anyway</strong>. If Windows says it “cannot access the
+          specified device, path or file”, right-click the installer, choose
+          <strong>Properties</strong>, tick <strong>Unblock</strong> and click OK.
+          On a managed PC, ask whoever looks after it.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <!-- ───────────── How it works ───────────── -->
+  <section class="section section-alt" id="how">
+    <div class="wrap">
+      <h2 class="section-title">How it works</h2>
+      <ol class="steps">
+        <li>
+          <span class="step-num">1</span>
+          <h3>Load the service</h3>
+          <p>Drag in your hymns and recordings. Number the files <code>01</code>, <code>02</code>… and they line up in order.</p>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <h3>Choose the sound</h3>
+          <p>Pick an instrument for each MIDI hymn: pipe organ for the entrance, piano or harp for Communion.</p>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <h3>Press to play</h3>
+          <p>One press plays. Press twice or hold to fade. The next track is ready and waiting.</p>
+        </li>
+      </ol>
+
+      <div class="table-wrap">
+        <table class="controls">
+          <caption>Controls</caption>
+          <thead>
+            <tr><th scope="col">Action</th><th scope="col">Button</th><th scope="col">Keyboard</th><th scope="col">Clicker</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Play the next track</th><td>Press</td><td>Space, Right arrow, Enter</td><td>Forward</td></tr>
+            <tr><th scope="row">Fade out and stop</th><td>Press twice, or hold</td><td>Left arrow, F, or hold Space</td><td>Back</td></tr>
+            <tr><th scope="row">Stop at once</th><td>—</td><td>Escape</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fine center">A single accidental press while music is playing does nothing, so a knocked clicker will not interrupt the service.</p>
+
+      <ul class="features">
+        <li><strong>Audio and MIDI together</strong>MP3, WAV, OGG and FLAC alongside MIDI in one playlist.</li>
+        <li><strong>A real pipe organ</strong>Sampled pipe by pipe from the 1967 Hammarberg organ in Bureå church.</li>
+        <li><strong>Level matching</strong>Recordings and MIDI are balanced against each other, so nothing jumps out.</li>
+        <li><strong>Tempo on the fly</strong>Slow a hymn down or speed it up while it plays, without changing its pitch.</li>
+        <li><strong>Remembers each hymn</strong>Its tempo and instrument come back next time the file is loaded.</li>
+        <li><strong>Easy to read</strong>White, Parchment or Blue colour schemes, and layouts for any size of screen.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ───────────── Hymn music ───────────── -->
+  <section class="section" id="music">
+    <div class="wrap">
+      <h2 class="section-title">Free hymn music to download</h2>
+      <p class="section-intro">
+        These sites offer MIDI files, and some MP3 recordings, of hymns that
+        you can download free and load straight into the player.
+      </p>
+
+      <ul class="link-grid">
+        <li>
+          <a class="card link-card" href="https://hymnary.org/" target="_blank" rel="noopener">
+            <span class="link-name">Hymnary.org</span>
+            <span class="link-desc">The largest hymn index online. Many tune pages carry a MIDI file to download.</span>
+            <span class="link-tags">MIDI · Sheet music</span>
+          </a>
+        </li>
+        <li>
+          <a class="card link-card" href="http://www.hymntime.com/tch/" target="_blank" rel="noopener">
+            <span class="link-name">The Cyber Hymnal</span>
+            <span class="link-desc">Thousands of hymns, each with its words, history and a MIDI of the tune.</span>
+            <span class="link-tags">MIDI · Words</span>
+          </a>
+        </li>
+        <li>
+          <a class="card link-card" href="https://www.nethymnal.org/" target="_blank" rel="noopener">
+            <span class="link-name">NetHymnal</span>
+            <span class="link-desc">A free hymn collection with words and MIDI tunes, arranged alphabetically.</span>
+            <span class="link-tags">MIDI · Words</span>
+          </a>
+        </li>
+        <li>
+          <a class="card link-card" href="https://www.smallchurchmusic.com/" target="_blank" rel="noopener">
+            <span class="link-name">Small Church Music</span>
+            <span class="link-desc">Hymns played on pipe organ and piano, free for churches without a musician.</span>
+            <span class="link-tags">MP3 · MIDI</span>
+          </a>
+        </li>
+        <li>
+          <a class="card link-card" href="http://openhymnal.org/" target="_blank" rel="noopener">
+            <span class="link-name">The Open Hymnal Project</span>
+            <span class="link-desc">Public-domain hymns with MIDI files, free to use and share.</span>
+            <span class="link-tags">MIDI · Public domain</span>
+          </a>
+        </li>
+        <li>
+          <a class="card link-card" href="https://www.hymnsite.com/" target="_blank" rel="noopener">
+            <span class="link-name">HymnSite.com</span>
+            <span class="link-desc">MIDI files for the hymns of a full hymnal, listed by title and number.</span>
+            <span class="link-tags">MIDI</span>
+          </a>
+        </li>
+        <li>
+          <a class="card link-card" href="https://www.hymnsandcarolsofchristmas.com/" target="_blank" rel="noopener">
+            <span class="link-name">Hymns and Carols of Christmas</span>
+            <span class="link-desc">Advent and Christmas carols with their history, many with MIDI.</span>
+            <span class="link-tags">MIDI · Seasonal</span>
+          </a>
+        </li>
+        <li>
+          <a class="card link-card" href="https://www.mutopiaproject.org/" target="_blank" rel="noopener">
+            <span class="link-name">The Mutopia Project</span>
+            <span class="link-desc">Free classical scores with MIDI, including organ voluntaries and chorales.</span>
+            <span class="link-tags">MIDI · Organ</span>
+          </a>
+        </li>
+      </ul>
+      <p class="fine">
+        These are independent sites, not connected with Parish Music Player.
+        Many hymn tunes are in the public domain, but some arrangements and
+        recordings are not; check each site’s terms, and your church’s
+        copyright licence, before use.
+      </p>
+    </div>
+  </section>
+
+  <!-- ───────────── Feedback ───────────── -->
+  <section class="section section-alt" id="feedback">
+    <div class="wrap narrow">
+      <h2 class="section-title">Feedback</h2>
+      <p class="section-intro">
+        Found a problem, have an idea, or just want to say how it went on
+        Sunday? Every message is read.
+      </p>
+
+      <form class="card feedback-form" id="feedbackForm" novalidate>
+        <div class="field-row">
+          <div class="field">
+            <label for="fbName">Your name <span class="opt">optional</span></label>
+            <input id="fbName" name="name" type="text" autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="fbEmail">Email <span class="opt">if you’d like a reply</span></label>
+            <input id="fbEmail" name="email" type="email" autocomplete="email">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="fbParish">Parish or church <span class="opt">optional</span></label>
+            <input id="fbParish" name="parish" type="text" autocomplete="organization">
+          </div>
+          <div class="field">
+            <label for="fbType">About</label>
+            <select id="fbType" name="topic">
+              <option>A suggestion</option>
+              <option>Something went wrong</option>
+              <option>A question</option>
+              <option>Just saying thanks</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="fbWhich">Which version</label>
+          <select id="fbWhich" name="version">
+            <option>The online player</option>
+            <option>The installed Windows player</option>
+            <option>Both, or not sure</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fbMessage">Message</label>
+          <textarea id="fbMessage" name="message" rows="6" required></textarea>
+        </div>
+        <!-- Spam trap: people never see it, bots fill it in -->
+        <div class="trap" aria-hidden="true">
+          <label for="fbHoney">Leave this empty</label>
+          <input id="fbHoney" name="_honey" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="form-foot">
+          <button class="btn btn-primary" type="submit" id="fbSubmit">Send feedback</button>
+          <p class="form-status" id="fbStatus" role="status" aria-live="polite"></p>
+        </div>
+        <p class="fine">Your details are used only to reply to you, and never shared.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ───────────── Support ───────────── -->
+  <section class="section" id="support">
+    <div class="wrap narrow center">
+      <h2 class="section-title">Support the project</h2>
+      <p class="section-intro">
+        Parish Music Player is free, and always will be. If it has helped your
+        church and you would like to say thank you, a coffee is very welcome.
+      </p>
+      <a class="btn btn-coffee" id="coffeeBtn" href="#support" aria-disabled="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8Zm13 1h1.5a2.5 2.5 0 0 1 0 5H17M6 3v2m4-2v2m4-2v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="coffeeLabel">Buy me a coffee — coming soon</span>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-row">
+    <p>Parish Music Player is free and open source under the MIT licence.
+      <a href="https://github.com/johnsav-uk/Parish-Music-Player" target="_blank" rel="noopener">Source code on GitHub</a>.</p>
+    <p class="fine">
+      Organ sounds recorded from the Hammarberg organ in Bureå church by Lars Palo,
+      prepared by Lars Palo and Graham Goode, used under CC BY-SA.
+      Other instruments from <a href="https://github.com/gleitz/midi-js-soundfonts" target="_blank" rel="noopener">midi-js-soundfonts</a> (MIT).
+    </p>
+  </div>
+</footer>
+
+<script src="js/site.js"></script>
+</body>
+</html>

@@ -21,3 +21,6 @@ src/soundfonts/manifest.json.tmp
 
 # Local Claude Code configuration (test servers and the like)
 .claude/
+
+# Website build output (website/build.py)
+_site/
