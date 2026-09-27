@@ -219,7 +219,11 @@
   }
   .pl-num { font-size: 11px; color: var(--text2); min-width: 22px; }
   .pl-item.active .pl-num, .pl-item.queued .pl-num { color: inherit; opacity: 0.6; }
-  .drag-handle { font-size: 14px; color: var(--text2); cursor: grab; padding-right: 4px; flex-shrink: 0; }
+  /* The only part of a row that drags. Padded out, with negative margins so
+     the row's layout is unchanged, to give it a target a hand can find. */
+  .drag-handle { font-size: 14px; color: var(--text2); cursor: grab; flex-shrink: 0;
+                 padding: 6px 8px 6px 6px; margin: -6px -4px -6px -6px; border-radius: 4px; }
+  .drag-handle:hover { background: rgba(var(--accent-rgb),0.14); color: var(--gold2); }
   .drag-handle:active { cursor: grabbing; }
   .pl-item.drag-over { background: rgba(var(--accent-rgb),0.26); border-top: 2px solid var(--gold); }
 

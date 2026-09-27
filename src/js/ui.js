@@ -61,16 +61,6 @@ function pressAndRepeat(button, act) {
   });
 }
 
-/**
- * Turn the containing playlist row's drag source on or off.
- *
- * Used to stop a press on a row's instrument dropdown from being read as the
- * start of a drag, which would close the dropdown again.
- */
-const setRowDraggable = (el, on) => {
-  const row = el.closest('.pl-item');
-  if (row) row.draggable = on;
-};
 
 const STATUS_CLASS = {
   [State.EMPTY]: 's-empty',
@@ -106,6 +96,7 @@ export class UI {
       instrument: $('midiInst'),
     };
     this.dragFrom = null;
+    this.ignoreClicksUntil = 0;
     this.rafId = null;
 
     player.on('change', () => this.render());
@@ -199,9 +190,6 @@ export class UI {
     const wrap = document.createElement('span');
     wrap.className = 'pl-tempo';
     wrap.title = 'Tempo for this hymn, remembered for next time';
-    wrap.draggable = false;
-    wrap.addEventListener('pointerenter', () => setRowDraggable(wrap, false));
-    wrap.addEventListener('pointerleave', () => setRowDraggable(wrap, true));
 
     const set = pct => this.player.setTrackTempo(i, pct);
     const button = (text, label, delta, disabled) => {
@@ -338,13 +326,22 @@ export class UI {
   _buildRow(track, i) {
     const row = document.createElement('div');
     row.className = this._rowClass(i) + (track.midi ? ' midi' : '');
-    row.draggable = true;
     row.dataset.i = String(i);
 
+    // Only the handle starts a drag, never the row.
+    //
+    // The whole row used to be the drag source, and a browser decides between
+    // a click and a drag by how far the pointer travels while the button is
+    // down: a few pixels and it is a drag. A click made with an ordinary hand
+    // on a mouse or a touchpad often travels that far, and a click that became
+    // a drag selected nothing, so going back to an earlier track looked
+    // impossible. It also closed an instrument dropdown the moment it opened,
+    // which needed its own workaround.
     const handle = document.createElement('span');
     handle.className = 'drag-handle';
     handle.title = 'Drag to reorder';
     handle.textContent = '↕';
+    handle.draggable = true;
 
     const num = document.createElement('span');
     num.className = 'pl-num';
@@ -411,24 +408,6 @@ export class UI {
       select.blur();
     });
 
-    // The dropdown has to stay open until the operator picks something or
-    // clicks away, and it did not.
-    //
-    // The row is a drag source, so that the playlist can be reordered. A press
-    // anywhere inside it, the dropdown included, arms a drag, and the moment
-    // the pointer moves a pixel the browser begins dragging the row and closes
-    // the list that had just opened. Whether it stayed open therefore depended
-    // on holding the mouse perfectly still, which is the fiddliness.
-    //
-    // Marking the wrapper `draggable = false` does not help, and neither does
-    // cancelling `dragstart` here: the drag source is the row, so `dragstart`
-    // fires there and never passes through this element at all. The row's own
-    // draggability has to be suspended instead, for as long as the pointer is
-    // over the dropdown.
-    wrap.draggable = false;
-    wrap.addEventListener('pointerenter', () => setRowDraggable(wrap, false));
-    wrap.addEventListener('pointerleave', () => setRowDraggable(wrap, true));
-
     wrap.appendChild(select);
     return wrap;
   }
@@ -436,20 +415,12 @@ export class UI {
   _bindPlaylist() {
     const box = this.el.playlist;
 
-    // Safety net for the draggability suspended while the pointer is over an
-    // instrument dropdown. The native list is drawn by the operating system
-    // and can swallow the pointer as it opens, so `pointerleave` is not
-    // guaranteed to arrive, and a row left undraggable could no longer be
-    // reordered. Any press elsewhere in the playlist restores every row.
-    box.addEventListener('pointerdown', e => {
-      if (e.target.closest('.pl-inst, .pl-tempo')) return;
-      for (const row of box.querySelectorAll('.pl-item')) row.draggable = true;
-    });
-
     box.addEventListener('click', e => {
-      if (e.target.closest('.pl-inst, .pl-tempo')) return;
+      if (e.target.closest('.pl-inst, .pl-tempo, .drag-handle')) return;
       const row = e.target.closest('.pl-item');
-      if (!row || !row.dataset.i || this.justDragged) return;
+      // The click that some browsers fire at the end of a drag is not a
+      // request to select anything.
+      if (!row || !row.dataset.i || performance.now() < this.ignoreClicksUntil) return;
       this.player.jumpTo(Number(row.dataset.i));
     });
 
@@ -457,10 +428,12 @@ export class UI {
       const row = e.target.closest('.pl-item');
       if (!row) return;
       this.dragFrom = Number(row.dataset.i);
-      this.justDragged = false;
       row.style.opacity = '0.4';
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', row.dataset.i);
+      // Drag the picture of the whole row, not just the small handle.
+      const r = row.getBoundingClientRect();
+      e.dataTransfer.setDragImage(row, e.clientX - r.left, e.clientY - r.top);
     });
 
     box.addEventListener('dragover', e => {
@@ -471,21 +444,35 @@ export class UI {
       if (row) row.classList.add('drag-over');
     });
 
+    // Everything the drag leaves behind is cleared here, at the drop, rather
+    // than in `dragend`.
+    //
+    // Clicks used to be ignored from the drop until `dragend` switched them
+    // back on. But the move rebuilds the list, so the row the drag began on is
+    // no longer in the page when `dragend` fires on it, and the event never
+    // reaches this box. Clicks then stayed ignored: after reordering, choosing
+    // a track did nothing until something else happened to reset it. The pause
+    // is now a moment that expires by itself.
     box.addEventListener('drop', e => {
       e.preventDefault();
       const row = e.target.closest('.pl-item');
-      if (!row || this.dragFrom === null) return;
-      this.justDragged = true;
-      this.player.move(this.dragFrom, Number(row.dataset.i));
-      this.dragFrom = null;
+      const from = this.dragFrom;
+      this._endDrag();
+      if (!row || from === null) return;
+      this.ignoreClicksUntil = performance.now() + 250;
+      this.player.move(from, Number(row.dataset.i));
     });
 
-    box.addEventListener('dragend', e => {
-      const row = e.target.closest('.pl-item');
-      if (row) row.style.opacity = '';
-      for (const el of box.querySelectorAll('.pl-item')) el.classList.remove('drag-over');
-      setTimeout(() => { this.justDragged = false; }, 50);
-    });
+    // A drag abandoned outside the list, where nothing was rebuilt.
+    box.addEventListener('dragend', () => this._endDrag());
+  }
+
+  _endDrag() {
+    this.dragFrom = null;
+    for (const el of this.el.playlist.querySelectorAll('.pl-item')) {
+      el.classList.remove('drag-over');
+      el.style.opacity = '';
+    }
   }
 
   /** One loop, running only while something is sounding. */

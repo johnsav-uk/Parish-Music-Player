@@ -5,11 +5,11 @@
 ; or, from the project root:
 ;     .\build\build.ps1 -Installer
 ;
-; Produces Output\ParishMusicPlayer-Setup-2.3.0.exe: one file for a parish to
+; Produces Output\ParishMusicPlayer-Setup-2.3.1.exe: one file for a parish to
 ; download, with a Start menu entry and a proper uninstaller.
 
 #define AppName        "Parish Music Player"
-#define AppVersion     "2.3.0"
+#define AppVersion     "2.3.1"
 #define AppPublisher   "Parish Music Player"
 #define AppURL         "https://github.com/johnsav-uk/Parish-Music-Player"
 #define AppExeName     "ParishMusicPlayer.exe"

@@ -3,8 +3,8 @@
 # and gives parishes nothing to check when reporting a problem.
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(2, 3, 0, 0),
-    prodvers=(2, 3, 0, 0),
+    filevers=(2, 3, 1, 0),
+    prodvers=(2, 3, 1, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -18,12 +18,12 @@ VSVersionInfo(
         '080904b0',
         [StringStruct('CompanyName', 'Parish Music Player'),
          StringStruct('FileDescription', 'Parish Music Player'),
-         StringStruct('FileVersion', '2.3.0.0'),
+         StringStruct('FileVersion', '2.3.1.0'),
          StringStruct('InternalName', 'ParishMusicPlayer'),
          StringStruct('LegalCopyright', 'MIT Licence. Free for all parishes.'),
          StringStruct('OriginalFilename', 'ParishMusicPlayer.exe'),
          StringStruct('ProductName', 'Parish Music Player'),
-         StringStruct('ProductVersion', '2.3.0.0')])
+         StringStruct('ProductVersion', '2.3.1.0')])
     ]),
     VarFileInfo([VarStruct('Translation', [0x0809, 1200])])
   ]

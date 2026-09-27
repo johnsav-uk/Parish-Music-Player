@@ -11,6 +11,17 @@ The installer:
 2.2.1 was never distributed widely; 2.1.0 is the version in the wild. The
 2.2.1 installer is kept beside this one.
 
+## 2.3.1
+
+One fix, to the playlist. After dragging a track to a new position, clicking a
+track selected nothing until something else reset it. Clicks were ignored from
+the drop until `dragend` switched them back on, but the move rebuilds the list,
+so the row the drag began on had left the page and its `dragend` never reached
+the list. The pause after a drop now expires by itself (`ignoreClicksUntil` in
+`ui.js`), and only the ↕ handle starts a drag, so a click with an ordinary
+hand's worth of movement is no longer read as the start of one. The bug
+predates 2.3.0.
+
 ## What changed since 2.2.1
 
 **Settings now survive a restart.** They never did. localStorage belongs to an
