@@ -826,3 +826,72 @@
     html[data-layout="wide-anchored"] #panelPlayer:not([hidden]) { grid-template-rows: auto auto auto auto auto auto; }
     html[data-layout="wide-anchored"] .playlist-box { max-height: 260px; }
   }
+
+  /* ── Phones ───────────────────────────────────────────────────────────────
+     The player is built for a church PC, but the online version is also opened
+     on phones, and at 375px it did not fit: every settings row kept a 130px
+     label, a slider and its value on one line and pushed the page 40px wider
+     than the screen, and each playlist row gave all its width to the
+     instrument and tempo controls, leaving none at all for the hymn's name.
+
+     Here the rows wrap instead. A setting's label sits above its control, and
+     a hymn's controls drop to a second line beneath its name. Everything a
+     finger presses is at least 40px, and the anchored layout, which fixes the
+     page to the window, gives way to the ordinary scrolling column.          */
+  @media (max-width: 560px) {
+    body,
+    html[data-layout^="wide"] body { padding: 1rem 16px 1.5rem; }
+
+    .app-header { margin-bottom: 1.1rem; padding-bottom: 1rem; }
+    .app-logo, html[data-layout^="wide"] .app-logo { width: 60px; height: 60px; }
+    .tab { padding: 10px 24px; }
+
+    .settings-card,
+    html[data-layout^="wide"] .settings-card { padding: 1rem; }
+    .settings-row { flex-wrap: wrap; row-gap: 8px; }
+    .settings-row label { flex: 1 0 100%; min-width: 0; white-space: normal; font-size: 13px; }
+    .settings-row select { min-height: 42px; font-size: 16px; }
+    .settings-row input[type=range] { min-height: 32px; }
+    /* A checkbox keeps its label beside it: it is one thing, not a control. */
+    .settings-row:has(input[type="checkbox"]) label { flex: 1 1 0; order: 1; }
+    .settings-row:has(input[type="checkbox"]) input[type="checkbox"] { width: 22px; height: 22px; }
+    .settings-row:has(input[type="checkbox"]) .settings-note { flex-basis: 100%; order: 2; }
+    .settings-row span.settings-note { flex-basis: 100%; font-size: 12px; }
+    .scheme-switch { flex-wrap: wrap; }
+    .scheme-btn { min-height: 42px; }
+    .learn-row { flex-wrap: wrap; }
+    .learn-label { min-width: 0; flex: 1 0 100%; }
+    .learn-btn { min-height: 40px; padding: 8px 16px; }
+    .toggle-diag-btn { min-height: 40px; }
+
+    .playlist-head .upload-btn { padding: 11px 16px; font-size: 13px; }
+    .playlist-box,
+    html[data-layout^="wide"] .playlist-box { max-height: 50vh; }
+    .pl-item,
+    html[data-layout^="wide"] .pl-item { flex-wrap: wrap; row-gap: 8px; padding: 12px; font-size: 14px; }
+    .drag-handle { font-size: 18px; padding: 10px 12px; margin: -10px -4px -10px -8px; touch-action: none; }
+    .pl-name { flex: 1 1 calc(100% - 64px); white-space: normal; overflow-wrap: anywhere; line-height: 1.35; }
+    .pl-inst { margin-left: 38px; flex: 1 1 0; min-width: 0; }
+    .pl-inst-select { max-width: none; width: 100%; min-height: 36px; font-size: 14px; padding: 4px 10px; }
+    .pl-tempo { margin-left: auto; }
+    .pl-tempo .tempo-btn,
+    .tempo-btn { width: 36px; height: 36px; font-size: 18px; }
+    .tempo-live { flex-wrap: wrap; }
+    .tempo-note { flex-basis: 100%; margin-left: 0; }
+
+    .track-display,
+    html[data-layout^="wide"] .track-display { padding: 1rem; }
+    .seek { padding: 12px 0; }
+    .big-btn { padding: 30px; font-size: 1.25rem; -webkit-touch-callout: none; }
+    .hint { font-size: 12px; }
+
+    /* Anchored pins the page to the window, which a phone's collapsing address
+       bar and on-screen keyboard make unusable. It becomes the plain column. */
+    html[data-layout="wide-anchored"],
+    html[data-layout="wide-anchored"] body { height: auto; }
+    html[data-layout="wide-anchored"] body { display: block; overflow: visible; }
+    html[data-layout="wide-anchored"] #panelPlayer:not([hidden]) { display: block; }
+    html[data-layout="wide-anchored"] #secSound .settings-card { display: block; }
+    html[data-layout="wide-anchored"] #secSound .settings-row { margin-bottom: 12px; }
+    html[data-layout="wide-anchored"] .playlist-box { max-height: 50vh; }
+  }

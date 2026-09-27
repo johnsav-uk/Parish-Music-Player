@@ -9,6 +9,14 @@ import { UI } from './ui.js';
 
 const $ = id => document.getElementById(id);
 
+// On an iPhone or iPad, Web Audio counts as incidental sound by default and is
+// silenced by the ring/silent switch, so the online player would play nothing
+// on a phone left on silent in church. Declaring it playback, as a music app
+// is, keeps it audible. Only Safari has this; elsewhere it is skipped.
+try {
+  if (navigator.audioSession) navigator.audioSession.type = 'playback';
+} catch (e) {}
+
 const settings = new Settings();
 const player = new Player(settings);
 const ui = new UI(player, settings);
