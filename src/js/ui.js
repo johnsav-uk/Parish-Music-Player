@@ -96,6 +96,7 @@ export class UI {
       instrument: $('midiInst'),
     };
     this.dragFrom = null;
+    this.touchDragging = false;
     this.ignoreClicksUntil = 0;
     this.rafId = null;
 
@@ -425,6 +426,9 @@ export class UI {
     });
 
     box.addEventListener('dragstart', e => {
+      // A long press can start a native drag under a finger already being
+      // followed below. One drag at a time.
+      if (this.touchDragging) { e.preventDefault(); return; }
       const row = e.target.closest('.pl-item');
       if (!row) return;
       this.dragFrom = Number(row.dataset.i);
@@ -465,6 +469,51 @@ export class UI {
 
     // A drag abandoned outside the list, where nothing was rebuilt.
     box.addEventListener('dragend', () => this._endDrag());
+
+    // A finger on a phone or tablet. Browsers there either do not start a
+    // native drag from a touch or start it only after a long press, so the
+    // handle follows the finger itself: the row under it is marked as the drop
+    // target, and lifting the finger moves the track there. The mouse keeps
+    // the native drag above.
+    box.addEventListener('pointerdown', e => {
+      const handle = e.target.closest('.drag-handle');
+      if (!handle || e.pointerType === 'mouse') return;
+      const row = handle.closest('.pl-item');
+      if (!row) return;
+      e.preventDefault();
+      try { handle.setPointerCapture(e.pointerId); } catch (err) {}   // touch is captured anyway
+      this.touchDragging = true;
+      this.dragFrom = Number(row.dataset.i);
+      row.style.opacity = '0.4';
+      let target = row;
+
+      const onMove = ev => {
+        const under = document.elementFromPoint(ev.clientX, ev.clientY);
+        const over = under && under.closest('.pl-item');
+        if (!over || !box.contains(over) || over === target) return;
+        for (const el of box.querySelectorAll('.pl-item')) el.classList.remove('drag-over');
+        over.classList.add('drag-over');
+        target = over;
+        // Near the top or bottom of a list taller than its box, keep it moving.
+        const r = box.getBoundingClientRect();
+        if (ev.clientY < r.top + 30) box.scrollTop -= 20;
+        else if (ev.clientY > r.bottom - 30) box.scrollTop += 20;
+      };
+      const onEnd = ev => {
+        handle.removeEventListener('pointermove', onMove);
+        handle.removeEventListener('pointerup', onEnd);
+        handle.removeEventListener('pointercancel', onEnd);
+        const from = this.dragFrom;
+        const to = Number(target.dataset.i);
+        this.touchDragging = false;
+        this._endDrag();
+        this.ignoreClicksUntil = performance.now() + 250;
+        if (ev.type === 'pointerup' && from !== null && to !== from) this.player.move(from, to);
+      };
+      handle.addEventListener('pointermove', onMove);
+      handle.addEventListener('pointerup', onEnd);
+      handle.addEventListener('pointercancel', onEnd);
+    });
   }
 
   _endDrag() {
