@@ -1,0 +1,11 @@
+# Dependencies for the soundfont converter only. The player itself needs none of
+# these; see requirements.txt in the project root for that.
+
+# Arithmetic on sample arrays.
+numpy>=1.24
+
+# Supplies an ffmpeg binary without a system install or admin rights. ffmpeg
+# does two jobs here: decoding the WavPack files a GrandOrgue sample set is made
+# of, and encoding the MP3s the player loads. If ffmpeg is already on PATH it is
+# used in preference and this package is not needed.
+imageio-ffmpeg>=0.4.9

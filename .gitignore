@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build output. build/ holds the spec, the build script and the installer
+# script, which are all source; PyInstaller's scratch directory is not.
+build/pyi/
+build/parish_music_player/
+dist/
+Output/
+
+# Embedded Python runtime from the previous distribution
+python/
+python-embed.zip
+
+# Generated at launch from whatever is in src/soundfonts/
+src/soundfonts/manifest.json
+src/soundfonts/manifest.json.tmp
+
+# Local Claude Code configuration (test servers and the like)
+.claude/

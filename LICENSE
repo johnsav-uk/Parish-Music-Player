@@ -1,0 +1,88 @@
+MIT License
+
+Copyright (c) 2026 Parish Music Player contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+Most of the bundled instrument sounds in src/soundfonts/ come from the MIDI.js
+soundfont collection (https://github.com/gleitz/midi-js-soundfonts), generated
+from FluidR3_GM and MusyngKite, and are distributed under the MIT Licence.
+
+---
+
+The three pipe organ instruments are different, and carry a different licence.
+
+  src/soundfonts/pipe_organ-mp3.js
+  src/soundfonts/pipe_organ_full-mp3.js
+  src/soundfonts/pipe_organ_flute-mp3.js
+
+These are adaptations of the Bureå Church organ sample set, a recording of the
+1967 Hammarberg organ in Bureå, Sweden, made in May 2010 by Lars Palo and
+prepared for GrandOrgue by Lars Palo and Graham Goode.
+
+    http://familjenpalo.se/vpo/about-burea-church/
+
+The sample set is licensed under a Creative Commons Attribution-ShareAlike 2.5
+Sweden Licence:
+
+    https://creativecommons.org/licenses/by-sa/2.5/se/deed.en
+
+Those three files are adaptations of it, made by tools/build_soundfont.py, and
+so are distributed under the same Creative Commons Attribution-ShareAlike 2.5
+Sweden Licence rather than under the MIT Licence above. Attribution is to Lars
+Palo and Graham Goode. Anyone redistributing them, modified or not, must do so
+under those same terms.
+
+---
+
+Three piano instruments come from FreePats (https://freepats.zenvoid.org/),
+converted by tools/build_sf2.py from the soft velocity layers of each.
+
+  src/soundfonts/soft_grand_piano-mp3.js
+      From the Salamander Grand Piano, a Yamaha C5 recorded by Alexander Holm,
+      in the SF2 edition assembled by Roberto (roberto@zenvoid.org) for
+      FreePats. Creative Commons Attribution 3.0:
+      https://creativecommons.org/licenses/by/3.0/
+
+  src/soundfonts/yamaha_grand_piano-mp3.js
+      From the YDP Grand Piano by Roberto for FreePats, built from the Zenph
+      Studios Yamaha Disklavier Pro Piano Multisamples for OLPC, recorded by
+      Dr. Mikhail Krishtal and his team at Zenph Studios. Creative Commons
+      Attribution 3.0: https://creativecommons.org/licenses/by/3.0/
+
+  src/soundfonts/upright_piano-mp3.js
+      From Upright Piano KW, a Kawai upright recorded by Gonzalo and Roberto
+      for FreePats. Dedicated to the public domain under CC0 1.0:
+      https://creativecommons.org/publicdomain/zero/1.0/
+
+---
+
+One organ instrument is of unknown licence.
+
+  src/soundfonts/magnificent_gothic-mp3.js
+
+It is converted from Maggoth2.sf2, a 1995 Sound Blaster AWE32 soundfont that
+records no author or copyright. Find out whether it may be redistributed before
+it is included in anything given to anyone else.
+
+---
+
+The rest of this project, the converter included, remains MIT.
