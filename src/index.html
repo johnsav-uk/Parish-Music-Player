@@ -44,8 +44,12 @@
   <section class="section">
     <div class="playlist-head">
       <h2 class="label">Service music</h2>
-      <label class="upload-btn" for="fileIn">+ Load files</label>
+      <div class="playlist-actions">
+        <button type="button" class="upload-btn" id="clearList" tabindex="-1" hidden>Clear list</button>
+        <label class="upload-btn" for="fileIn">+ Add files</label>
+      </div>
       <input type="file" id="fileIn" multiple accept="audio/*,.mid,.midi">
+      <input type="file" id="replaceIn" accept="audio/*,.mid,.midi">
     </div>
     <div class="playlist-box" id="playlist"></div>
   </section>

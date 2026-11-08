@@ -93,8 +93,12 @@ export class UI {
       vFill: $('vFill'),
       sfInfo: $('sfInfo'),
       fileIn: $('fileIn'),
+      replaceIn: $('replaceIn'),
+      clearList: $('clearList'),
       instrument: $('midiInst'),
     };
+    this.menu = null;
+    this.replacing = null;
     this.dragFrom = null;
     this.touchDragging = false;
     this.ignoreClicksUntil = 0;
@@ -105,6 +109,7 @@ export class UI {
 
     this._bindTabs();
     this._bindPlaylist();
+    this._bindTrackMenu();
     this._bindSeek();
     this._bindTempo();
   }
@@ -156,6 +161,8 @@ export class UI {
                 : '▶ Play';
     this.el.mainBtn.textContent = label;
     this.el.mainBtn.classList.toggle('fading', p.state === State.FADING);
+    this.el.clearList.hidden = !p.tracks.length;
+    this.el.clearList.disabled = !p.canEdit;
 
     this.renderPlaylist();
     this.renderTempo();
@@ -301,7 +308,7 @@ export class UI {
     if (!p.tracks.length) {
       const empty = document.createElement('div');
       empty.className = 'pl-empty';
-      empty.textContent = 'No music loaded. Click “Load files” to choose this service’s music.';
+      empty.textContent = 'No music loaded. Click “Add files” to choose this service’s music.';
       box.appendChild(empty);
       return;
     }
@@ -365,7 +372,134 @@ export class UI {
       badge.textContent = 'audio';
       row.appendChild(badge);
     }
+
+    // Right-click opens the same menu, but a phone has no right-click.
+    const more = document.createElement('button');
+    more.type = 'button';
+    more.className = 'pl-more';
+    more.textContent = '⋮';
+    more.title = 'Remove or replace';
+    more.setAttribute('aria-label', 'Remove or replace ' + displayName(track.name));
+    more.disabled = !this.player.canEdit;
+    more.tabIndex = -1;                  // focus here would swallow the spacebar
+    more.addEventListener('mousedown', e => e.preventDefault());
+    more.addEventListener('click', e => {
+      e.stopPropagation();
+      const r = more.getBoundingClientRect();
+      this._openTrackMenu(track, r.right, r.bottom);
+    });
+    row.appendChild(more);
     return row;
+  }
+
+  // -- Track menu ------------------------------------------------------------
+
+  /**
+   * The menu is drawn in the page, and so are its confirmations. A browser's
+   * own confirm() box halts all script until it is answered, and MIDI notes are
+   * scheduled from script, so asking a question that way would stall the hymn
+   * being asked about.
+   *
+   * Escape deliberately does not close it. Escape is the emergency stop, and a
+   * habit of pressing it to dismiss a menu would silence the music.
+   */
+  _bindTrackMenu() {
+    this.el.playlist.addEventListener('contextmenu', e => {
+      const row = e.target.closest('.pl-item');
+      if (!row) return;
+      e.preventDefault();
+      // A long press on the handle is a drag in progress, not a request.
+      if (this.touchDragging) return;
+      const track = this.player.tracks[Number(row.dataset.i)];
+      if (track) this._openTrackMenu(track, e.clientX, e.clientY);
+    });
+
+    window.addEventListener('pointerdown', e => {
+      if (this.menu && !this.menu.contains(e.target)) this._closeMenu();
+    }, true);
+    window.addEventListener('scroll', () => this._closeMenu(), true);
+    window.addEventListener('resize', () => this._closeMenu());
+
+    const input = this.el.replaceIn;
+    input.addEventListener('change', () => {
+      const file = input.files[0];
+      const pending = this.replacing;
+      input.value = '';                  // allows choosing the same file later
+      this.replacing = null;
+      if (!file || !pending) return;
+      // Asked now rather than before the file was chosen, because whether this
+      // track is playing can have changed while the file dialog was open.
+      this._confirmIfPlaying(pending.track, 'Stop the music and replace', pending.at,
+        () => this.player.replaceTrack(pending.track, file));
+    });
+
+    const clear = this.el.clearList;
+    clear.addEventListener('mousedown', e => e.preventDefault());
+    clear.addEventListener('click', () => {
+      const p = this.player;
+      if (!p.canEdit) return;
+      const r = clear.getBoundingClientRect();
+      const n = p.tracks.length;
+      this._showMenu(r.right, r.bottom, 'Remove ' + (n === 1 ? 'the 1 track' : 'all ' + n + ' tracks') + ' from the list?', [
+        { label: p.isSounding ? 'Stop the music and clear' : 'Clear list', danger: true, act: () => p.clearList() },
+        { label: 'Cancel', act: () => {} },
+      ]);
+    });
+  }
+
+  _openTrackMenu(track, x, y) {
+    if (!this.player.canEdit) return;
+    // A rebuild is skipped while a dropdown has focus; see renderPlaylist.
+    if (this.el.playlist.contains(document.activeElement)) document.activeElement.blur();
+    const at = { x, y };
+    this._showMenu(x, y, null, [
+      { label: 'Replace…', act: () => { this.replacing = { track, at }; this.el.replaceIn.click(); } },
+      { label: 'Remove', danger: true, act: () => this._confirmIfPlaying(
+          track, 'Stop the music and remove', at, () => this.player.removeTrack(track)) },
+    ]);
+  }
+
+  /** Only cutting off the music needs asking about; anything else just happens. */
+  _confirmIfPlaying(track, label, at, act) {
+    const p = this.player;
+    if (!p.isSounding || p.currentTrack !== track) { act(); return; }
+    this._showMenu(at.x, at.y, 'This track is playing.', [
+      { label, danger: true, act },
+      { label: 'Keep playing', act: () => {} },
+    ]);
+  }
+
+  _showMenu(x, y, title, items) {
+    this._closeMenu();
+    const menu = document.createElement('div');
+    menu.className = 'pl-menu';
+    menu.setAttribute('role', 'menu');
+    if (title) {
+      const heading = document.createElement('div');
+      heading.className = 'pl-menu-title';
+      heading.textContent = title;
+      menu.appendChild(heading);
+    }
+    for (const item of items) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'pl-menu-item' + (item.danger ? ' danger' : '');
+      b.setAttribute('role', 'menuitem');
+      b.textContent = item.label;
+      b.tabIndex = -1;
+      b.addEventListener('mousedown', e => e.preventDefault());
+      b.addEventListener('click', () => { this._closeMenu(); item.act(); });
+      menu.appendChild(b);
+    }
+    document.body.appendChild(menu);
+    const margin = 8, r = menu.getBoundingClientRect();
+    menu.style.left = Math.max(margin, Math.min(x, window.innerWidth - r.width - margin)) + 'px';
+    menu.style.top = Math.max(margin, Math.min(y, window.innerHeight - r.height - margin)) + 'px';
+    this.menu = menu;
+  }
+
+  _closeMenu() {
+    if (this.menu) { this.menu.remove(); this.menu = null; }
   }
 
   _buildInstrumentSelect(track, i) {
@@ -417,7 +551,7 @@ export class UI {
     const box = this.el.playlist;
 
     box.addEventListener('click', e => {
-      if (e.target.closest('.pl-inst, .pl-tempo, .drag-handle')) return;
+      if (e.target.closest('.pl-inst, .pl-tempo, .drag-handle, .pl-more')) return;
       const row = e.target.closest('.pl-item');
       // The click that some browsers fire at the end of a drag is not a
       // request to select anything.

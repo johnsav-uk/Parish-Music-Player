@@ -490,6 +490,36 @@
   }
   .playlist-head .label { margin-bottom: 0; }
   .playlist-head .upload-btn { margin-bottom: 0; padding: 7px 14px; font-size: 12px; }
+  .playlist-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  button.upload-btn { font-family: inherit; }
+  button.upload-btn[hidden] { display: none; }
+  button.upload-btn:disabled { opacity: 0.5; cursor: default; }
+
+  /* The way to a track's Remove and Replace, for those without a right-click. */
+  .pl-more {
+    flex-shrink: 0; width: 24px; height: 24px; margin: -4px -6px -4px 2px;
+    font-size: 16px; line-height: 1; color: var(--text2);
+    background: none; border: 0; border-radius: 4px; cursor: pointer;
+  }
+  .pl-more:hover { background: rgba(var(--accent-rgb),0.14); color: var(--gold2); }
+  .pl-more:disabled { opacity: 0.4; cursor: default; }
+
+  .pl-menu {
+    position: fixed; z-index: 100; min-width: 150px; max-width: calc(100vw - 16px);
+    padding: 4px;
+    background: var(--navy2);
+    border: 1px solid var(--border2);
+    border-radius: var(--rs);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  }
+  .pl-menu-title { padding: 7px 12px 5px; font-size: 12px; color: var(--text2); }
+  .pl-menu-item {
+    display: block; width: 100%; padding: 8px 12px;
+    font-family: inherit; font-size: 13px; text-align: left; color: var(--text);
+    background: none; border: 0; border-radius: 5px; cursor: pointer;
+  }
+  .pl-menu-item:hover { background: var(--navy3); }
+  .pl-menu-item.danger { color: var(--bad); }
 
   .pl-empty {
     padding: 22px 16px; font-size: 13px;
@@ -870,7 +900,11 @@
     .pl-item,
     html[data-layout^="wide"] .pl-item { flex-wrap: wrap; row-gap: 8px; padding: 12px; font-size: 14px; }
     .drag-handle { font-size: 18px; padding: 10px 12px; margin: -10px -4px -10px -8px; touch-action: none; }
-    .pl-name { flex: 1 1 calc(100% - 64px); white-space: normal; overflow-wrap: anywhere; line-height: 1.35; }
+    .pl-name { flex: 1 1 calc(100% - 112px); white-space: normal; overflow-wrap: anywhere; line-height: 1.35; }
+    /* Beside the name, on the first line, with the hymn's controls below it. */
+    .pl-more { order: 1; width: 40px; height: 40px; margin: -8px -8px -8px 0; font-size: 20px; }
+    .pl-inst, .pl-tempo, .pl-badge { order: 2; }
+    .pl-menu-item { padding: 12px 14px; font-size: 15px; }
     .pl-inst { margin-left: 38px; flex: 1 1 0; min-width: 0; }
     .pl-inst-select { max-width: none; width: 100%; min-height: 36px; font-size: 14px; padding: 4px 10px; }
     .pl-tempo { margin-left: auto; }
