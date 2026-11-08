@@ -31,6 +31,26 @@ from generate_manifest import write_manifest  # noqa: E402
 
 SKIP = {"build.py", "__pycache__"}
 
+# Added at build time, and only to the published pages. The player in ``src`` is
+# also what gets installed on church computers, which must not call out to
+# anything.
+ANALYTICS = (
+    "<!-- Cloudflare Web Analytics --><script type='module' "
+    "src='https://static.cloudflareinsights.com/beacon.min.js' "
+    "data-cf-beacon='{\"token\": \"597d8741dde04f27b28c5b19376b6013\"}'></script>"
+    "<!-- End Cloudflare Web Analytics -->"
+)
+
+
+def add_analytics(page: Path) -> None:
+    with page.open(encoding="utf-8", newline="") as f:
+        html = f.read()
+    if html.count("</body>") != 1:
+        raise SystemExit(f"{page} needs exactly one </body> for the analytics tag")
+    newline = "\r\n" if "\r\n" in html else "\n"
+    with page.open("w", encoding="utf-8", newline="") as f:
+        f.write(html.replace("</body>", ANALYTICS + newline + "</body>"))
+
 
 def build(out: Path) -> None:
     if out.exists():
@@ -41,6 +61,8 @@ def build(out: Path) -> None:
     shutil.copytree(HERE, out, ignore=lambda d, names: [n for n in names if n in SKIP])
     shutil.copytree(ROOT / "src", out / "play",
                     ignore=shutil.ignore_patterns("manifest.json", "manifest.json.tmp"))
+    for page in out.rglob("*.html"):
+        add_analytics(page)
     instruments = write_manifest(out / "play" / "soundfonts")
     print(f"Site built in {out} with {len(instruments)} instrument(s)")
 
