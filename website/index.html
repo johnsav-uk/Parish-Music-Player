@@ -27,7 +27,11 @@
       <img src="img/logo.png" alt="" width="40" height="40">
       <span>Parish Music Player</span>
     </a>
-    <nav class="site-nav" aria-label="Sections">
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="siteNav">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <span>Menu</span>
+    </button>
+    <nav class="site-nav" id="siteNav" aria-label="Sections">
       <a href="#get-it">Get it</a>
       <a href="#how">How it works</a>
       <a href="#music">Hymn music</a>
@@ -81,10 +85,10 @@
           <h3>Play online</h3>
           <p>Open it in your browser and load your music straight away. Nothing to install.</p>
           <ul class="ticks">
-            <li>Works in Chrome, Edge or Firefox on a laptop or desktop</li>
+            <li>Works in Chrome, Edge, Firefox or Safari, on a computer, tablet or phone</li>
             <li>Your music files stay on your computer. They are never uploaded</li>
             <li>Settings are remembered in that browser</li>
-            <li>The instruments download the first time (about 55&nbsp;MB), so try it before the service</li>
+            <li>The instruments download the first time (about 55&nbsp;MB), so try it before the service, and on Wi-Fi if you are using a phone</li>
           </ul>
           <a class="btn btn-primary btn-block" href="play/">Open the player</a>
         </article>
@@ -101,6 +105,13 @@
           </ul>
           <a class="btn btn-secondary btn-block js-installer" href="https://github.com/johnsav-uk/Parish-Music-Player/releases/latest">Download the installer</a>
           <p class="fine js-installer-meta">Latest version from GitHub.</p>
+          <div class="on-phone">
+            <p>On your phone? The installer is for the church’s Windows computer. Send yourself the link to open there.</p>
+            <button class="btn btn-secondary btn-block" type="button" id="shareBtn">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v8h14v-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Send the link to the church computer</span>
+            </button>
+          </div>
         </article>
       </div>
 
@@ -147,9 +158,9 @@
             <tr><th scope="col">Action</th><th scope="col">Button</th><th scope="col">Keyboard</th><th scope="col">Clicker</th></tr>
           </thead>
           <tbody>
-            <tr><th scope="row">Play the next track</th><td>Press</td><td>Space, Right arrow, Enter</td><td>Forward</td></tr>
-            <tr><th scope="row">Fade out and stop</th><td>Press twice, or hold</td><td>Left arrow, F, or hold Space</td><td>Back</td></tr>
-            <tr><th scope="row">Stop at once</th><td>—</td><td>Escape</td><td>—</td></tr>
+            <tr><th scope="row">Play the next track</th><td data-label="Button">Press</td><td data-label="Keyboard">Space, Right arrow, Enter</td><td data-label="Clicker">Forward</td></tr>
+            <tr><th scope="row">Fade out and stop</th><td data-label="Button">Press twice, or hold</td><td data-label="Keyboard">Left arrow, F, or hold Space</td><td data-label="Clicker">Back</td></tr>
+            <tr><th scope="row">Stop at once</th><td data-label="Button">—</td><td data-label="Keyboard">Escape</td><td data-label="Clicker">—</td></tr>
           </tbody>
         </table>
       </div>
@@ -255,17 +266,17 @@
         <div class="field-row">
           <div class="field">
             <label for="fbName">Your name <span class="opt">optional</span></label>
-            <input id="fbName" name="name" type="text" autocomplete="name">
+            <input id="fbName" name="name" type="text" autocomplete="name" autocapitalize="words" enterkeyhint="next">
           </div>
           <div class="field">
             <label for="fbEmail">Email <span class="opt">if you’d like a reply</span></label>
-            <input id="fbEmail" name="email" type="email" autocomplete="email">
+            <input id="fbEmail" name="email" type="email" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" enterkeyhint="next">
           </div>
         </div>
         <div class="field-row">
           <div class="field">
             <label for="fbParish">Parish or church <span class="opt">optional</span></label>
-            <input id="fbParish" name="parish" type="text" autocomplete="organization">
+            <input id="fbParish" name="parish" type="text" autocomplete="organization" autocapitalize="words" enterkeyhint="next">
           </div>
           <div class="field">
             <label for="fbType">About</label>
@@ -287,7 +298,7 @@
         </div>
         <div class="field">
           <label for="fbMessage">Message</label>
-          <textarea id="fbMessage" name="message" rows="6" required></textarea>
+          <textarea id="fbMessage" name="message" rows="6" required autocapitalize="sentences"></textarea>
         </div>
         <!-- Spam trap: people never see it, bots fill it in -->
         <div class="trap" aria-hidden="true">

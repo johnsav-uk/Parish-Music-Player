@@ -9,6 +9,14 @@ import { UI } from './ui.js';
 
 const $ = id => document.getElementById(id);
 
+// On an iPhone or iPad, Web Audio counts as incidental sound by default and is
+// silenced by the ring/silent switch, so the online player would play nothing
+// on a phone left on silent in church. Declaring it playback, as a music app
+// is, keeps it audible. Only Safari has this; elsewhere it is skipped.
+try {
+  if (navigator.audioSession) navigator.audioSession.type = 'playback';
+} catch (e) {}
+
 const settings = new Settings();
 const player = new Player(settings);
 const ui = new UI(player, settings);
@@ -72,7 +80,7 @@ bindRange('reverbSeconds', 'reverbSeconds', v => v.toFixed(1) + 's', null,
 
 bindCheckbox('sustainLoop', 'sustainLoop', scheduleRemeasure);
 bindCheckbox('dropPercussion', 'dropPercussion', () => {
-  ui.setStatus('Reload your MIDI files to apply', player.state);
+  ui.setStatus('Clear the list and add your MIDI files again to apply', player.state);
 });
 bindCheckbox('mediaKeys', 'mediaKeys', () => {
   if (settings.mediaKeys) controls.enableMediaKeys();
@@ -143,18 +151,18 @@ $('midiInst').addEventListener('change', async e => {
 
 ui.el.fileIn.addEventListener('change', async e => {
   const files = e.target.files;
-  if (files && files.length) await player.loadFiles(files);
+  if (files && files.length) await player.addFiles(files);
   e.target.value = '';               // allows re-selecting the same files later
 });
 
-// Dropping files onto the window loads them too.
+// Dropping files onto the window adds them too.
 ['dragover', 'drop'].forEach(type => {
   window.addEventListener(type, e => {
     if (!e.dataTransfer || !e.dataTransfer.types.includes('Files')) return;
     e.preventDefault();
     if (type === 'drop' && e.dataTransfer.files.length) {
       ui.showPlayerTab();
-      player.loadFiles(e.dataTransfer.files);
+      player.addFiles(e.dataTransfer.files);
     }
   });
 });

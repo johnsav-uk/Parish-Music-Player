@@ -61,6 +61,7 @@ export class Player {
     this.index = -1;
     this.state = State.EMPTY;
     this.generation = 0;
+    this.loadingFiles = false;
 
     this.ctx = null;
     this.masterGain = null;
@@ -194,45 +195,145 @@ export class Player {
 
   // -- Loading ---------------------------------------------------------------
 
-  async loadFiles(fileList) {
+  /**
+   * Add files to the end of the list.
+   *
+   * This used to empty the list first, so changing one hymn meant loading the
+   * whole service again. Whatever is playing now carries on undisturbed, which
+   * is why the state only becomes LOADING when nothing is sounding.
+   */
+  async addFiles(fileList) {
     const files = Array.from(fileList)
       .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
-    if (!files.length) return;
+    if (!files.length || !this.canEdit) return;
 
-    this.stop({ advance: false });
-    this.tracks = [];
-    this.index = -1;
-    this._setState(State.LOADING, 'Loading files...');
-
-    await this.resume();
+    const sounding = this.isSounding;
+    this.loadingFiles = true;
+    if (sounding) this._emit('change', this);
+    else this._setState(State.LOADING, 'Loading files...');
 
     const skipped = [];
-    for (let i = 0; i < files.length; i++) {
-      const f = files[i];
-      this._emit('status', 'Loading ' + (i + 1) + ' of ' + files.length + ': ' + f.name, State.LOADING);
-      // Yield so the window keeps repainting through a long playlist.
-      await new Promise(r => setTimeout(r, 0));
-      try {
-        this.tracks.push(isMidiName(f.name) ? await this._loadMidiTrack(f) : await this._loadAudioTrack(f));
-      } catch (err) {
-        console.warn('Skipping', f.name, err);
-        skipped.push(f.name);
+    try {
+      await this.resume();
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i];
+        this._emit('status', 'Loading ' + (i + 1) + ' of ' + files.length + ': ' + f.name, this.state);
+        // Yield so the window keeps repainting through a long playlist.
+        await new Promise(r => setTimeout(r, 0));
+        try {
+          this.tracks.push(await this._readTrack(f));
+        } catch (err) {
+          console.warn('Skipping', f.name, err);
+          skipped.push(f.name);
+        }
       }
+    } finally {
+      this.loadingFiles = false;
     }
 
-    if (!this.tracks.length) {
+    if (this.index < 0 && this.tracks.length) this.index = 0;
+
+    if (sounding) {
+      this._emit('change', this);
+      this._emit('status', 'Added ' + (files.length - skipped.length) + ' of ' + files.length + ' file(s)', this.state);
+      if (this.isSounding) this._warmNext();
+    } else if (!this.tracks.length) {
       this._setState(State.EMPTY, 'No playable files found');
       return;
+    } else {
+      this._setState(State.READY, skipped.length
+        ? 'Ready - ' + skipped.length + ' file(s) could not be read'
+        : 'Ready - press play');
     }
-
-    this.index = 0;
-    this._setState(State.READY, skipped.length
-      ? 'Ready - ' + skipped.length + ' file(s) could not be read'
-      : 'Ready - press play');
 
     // Warm the instrument and measure MIDI levels in the background so the
     // first trigger of the service is instant.
     this._prepareMidiLevels().catch(() => {});
+  }
+
+  _readTrack(file) {
+    return isMidiName(file.name) ? this._loadMidiTrack(file) : this._loadAudioTrack(file);
+  }
+
+  /**
+   * Whether the list may be changed right now. Not while files are being read,
+   * and not while play is waiting on an instrument: that press has already
+   * chosen its track, and taking the track away would play one no longer listed.
+   */
+  get canEdit() { return !this.loadingFiles && this.state !== State.LOADING; }
+
+  /** After a track is taken away or swapped: settle the state and the status. */
+  _listEdited() {
+    if (!this.tracks.length) {
+      this.index = -1;
+      this._setState(State.EMPTY, 'No music loaded');
+    } else if (this.isSounding) {
+      this._emit('change', this);
+      this._warmNext();
+    } else {
+      this._setState(State.READY, 'Ready - press play');
+    }
+  }
+
+  /**
+   * Take one track out of the list. Anything else playing carries on; if this
+   * is the track playing, it stops, and the track after it becomes the next
+   * to play.
+   */
+  removeTrack(track) {
+    const i = this.tracks.indexOf(track);
+    if (i < 0 || !this.canEdit) return false;
+    if (i === this.index && this.isSounding) this._finish({ advance: false });
+    this.tracks.splice(i, 1);
+    if (i < this.index) this.index--;
+    else if (this.index >= this.tracks.length) this.index = this.tracks.length - 1;
+    this._listEdited();
+    return true;
+  }
+
+  /**
+   * Put a different file in a track's place. The file is read first, so one
+   * that cannot be read leaves the list, and any music, exactly as they were.
+   */
+  async replaceTrack(track, file) {
+    if (!this.canEdit || !this.tracks.includes(track)) return false;
+    this.loadingFiles = true;
+    this._emit('change', this);
+    this._emit('status', 'Loading ' + file.name, this.state);
+
+    let fresh;
+    try {
+      await this.resume();
+      fresh = await this._readTrack(file);
+    } catch (err) {
+      console.warn('Could not replace with', file.name, err);
+      this.loadingFiles = false;
+      this._emit('change', this);
+      this._emit('status', 'Could not read ' + file.name + ' - track kept', this.state);
+      return false;
+    }
+    this.loadingFiles = false;
+
+    // Looked up again: the list can be reordered while the file is being read.
+    const i = this.tracks.indexOf(track);
+    if (i < 0) { this._emit('change', this); return false; }
+    // A press of play can have arrived meanwhile and be preparing this track.
+    if (i === this.index && (this.isSounding || this.state === State.LOADING)) {
+      this._finish({ advance: false });
+    }
+    this.tracks[i] = fresh;
+    this._listEdited();
+    this._prepareMidiLevels().catch(() => {});
+    return true;
+  }
+
+  /** Empty the list, stopping anything that is playing. */
+  clearList() {
+    if (!this.canEdit) return false;
+    if (this.isSounding) this._finish({ advance: false });
+    this.tracks = [];
+    this._listEdited();
+    return true;
   }
 
   async _loadAudioTrack(file) {

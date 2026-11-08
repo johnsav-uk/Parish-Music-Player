@@ -13,6 +13,7 @@ Free for all parishes.
 - **Clicker support** — arrow keys, Page Up and Page Down, and Bluetooth media buttons
 - **Level matching** — recorded audio and MIDI are measured and levelled against each other, so nothing jumps out
 - **Drag-and-drop playlist** — reorder tracks during a service
+- **Change one track at a time** — right-click a track, or press its ⋮, to remove or replace it; added files join the end of the list
 - **An instrument per track** — organ for the hymns, piano for Communion, chosen before the service from the playlist itself
 - **A real pipe organ** — three registrations sampled from the 1967 Hammarberg organ in Bureå church, pipe by pipe
 - **Softer pianos** — a Yamaha grand and a Kawai upright, taken from their gently played recordings for a warmer tone

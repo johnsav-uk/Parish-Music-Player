@@ -57,6 +57,43 @@
     }
   }
 
+  /* ── Menu on phones ─────────────────────────────────────────────────── */
+
+  var header = document.querySelector('.site-header');
+  var menuBtn = document.querySelector('.menu-btn');
+  if (header && menuBtn) {
+    var setMenu = function (open) {
+      header.classList.toggle('open', open);
+      menuBtn.setAttribute('aria-expanded', String(open));
+    };
+    menuBtn.addEventListener('click', function () {
+      setMenu(!header.classList.contains('open'));
+    });
+    // Choosing a section closes the menu so the section is not hidden under it.
+    header.querySelectorAll('.site-nav a').forEach(function (a) {
+      a.addEventListener('click', function () { setMenu(false); });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && header.classList.contains('open')) { setMenu(false); menuBtn.focus(); }
+    });
+  }
+
+  /* ── Sending the link to the church computer ────────────────────────── */
+
+  var shareBtn = document.getElementById('shareBtn');
+  if (shareBtn) {
+    var pageUrl = 'https://www.johnsav.co.uk/parishmusicplayer/#get-it';
+    shareBtn.addEventListener('click', function () {
+      var text = 'Parish Music Player: download the Windows installer on the church computer';
+      if (navigator.share) {
+        navigator.share({ title: 'Parish Music Player', text: text, url: pageUrl }).catch(function () {});
+      } else {
+        location.href = 'mailto:?subject=' + encodeURIComponent('Parish Music Player') +
+          '&body=' + encodeURIComponent(text + '\n\n' + pageUrl);
+      }
+    });
+  }
+
   /* ── Feedback form ──────────────────────────────────────────────────── */
 
   var form = document.getElementById('feedbackForm');

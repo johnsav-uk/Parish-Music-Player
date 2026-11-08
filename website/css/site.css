@@ -99,12 +99,30 @@ code { font-size: 0.9em; background: rgba(122,93,23,0.10); padding: 1px 5px; bor
 }
 .site-nav a:hover { color: var(--gold); background: rgba(122,93,23,0.08); }
 
+.menu-btn { display: none; }
+
+/* Phones: one slim bar, with the sections behind a Menu button. The five links
+   wrapped onto two lines and made the sticky header 120px tall, a sixth of
+   the screen, with targets only 30px high. */
 @media (max-width: 760px) {
-  .header-row { flex-direction: column; align-items: stretch; gap: 4px; padding-top: 8px; padding-bottom: 6px; }
-  .brand { justify-content: center; }
-  .site-nav { justify-content: center; gap: 0; }
-  .site-nav a { font-size: 14px; padding: 4px 8px; }
-  html { scroll-padding-top: 110px; }
+  .header-row { min-height: 56px; flex-wrap: wrap; gap: 0 12px; }
+  .brand { font-size: 0.95rem; }
+  .brand img { width: 36px; height: 36px; }
+  .menu-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    min-height: 44px; padding: 0 14px; margin-right: -6px;
+    font: 500 15px 'Inter', sans-serif; color: var(--text);
+    background: none; border: 1px solid var(--border-2); border-radius: var(--rs); cursor: pointer;
+  }
+  .menu-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; fill: none; }
+  .site-nav {
+    display: none; flex: 1 0 100%; flex-direction: column; gap: 0;
+    padding: 4px 0 10px; border-top: 1px solid var(--border);
+  }
+  .site-header.open .site-nav { display: flex; }
+  .site-nav a { font-size: 17px; padding: 0 8px; min-height: 48px; display: flex; align-items: center; border-radius: 0; border-bottom: 1px solid var(--border); }
+  .site-nav a:last-child { border-bottom: 0; }
+  html { scroll-padding-top: 68px; }
 }
 
 /* ── Buttons ────────────────────────────────────────────────────────── */
@@ -121,6 +139,7 @@ code { font-size: 0.9em; background: rgba(122,93,23,0.10); padding: 1px 5px; bor
 .btn-secondary { background: transparent; color: var(--gold); border-color: var(--border-2); }
 .btn-secondary:hover { background: rgba(122,93,23,0.08); color: var(--gold-2); border-color: var(--gold); }
 .btn-block { width: 100%; margin-top: auto; }
+.btn { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 .btn[disabled] { opacity: 0.6; cursor: progress; }
 
 .btn-coffee { background: var(--coffee); color: var(--coffee-fg); margin-top: 24px; }
@@ -181,6 +200,14 @@ code { font-size: 0.9em; background: rgba(122,93,23,0.10); padding: 1px 5px; bor
   border-left: 2px solid var(--gold); border-bottom: 2px solid var(--gold); transform: rotate(-45deg);
 }
 .choice .fine { text-align: center; margin-top: -4px; }
+
+/* Only on a phone or tablet: the installer is for the church computer. */
+.on-phone { display: none; }
+@media (pointer: coarse) and (max-width: 1024px) {
+  .on-phone { display: grid; gap: 12px; margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .on-phone p { font-size: 15px; color: var(--text-2); }
+  .on-phone .btn-block { margin-top: 0; }
+}
 @media (max-width: 760px) { .choice-grid { grid-template-columns: 1fr; } .choice { padding: 22px; } }
 
 .note {
@@ -212,6 +239,20 @@ table.controls thead th { font-size: 12px; letter-spacing: 0.12em; text-transfor
 table.controls tbody th { font-weight: 600; color: var(--text); }
 table.controls td { color: var(--text-2); }
 table.controls tbody tr:last-child > * { border-bottom: 0; }
+
+/* A phone has no room for four columns: each action becomes a small card,
+   its button, key and clicker listed beneath it. */
+@media (max-width: 600px) {
+  .table-wrap { overflow: visible; }
+  table.controls { min-width: 0; }
+  table.controls thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  table.controls tr { display: block; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  table.controls tbody tr:last-child { border-bottom: 0; }
+  table.controls th, table.controls td { display: block; padding: 3px 0; border: 0; }
+  table.controls tbody th { font-size: 16px; margin-bottom: 4px; }
+  table.controls td { display: grid; grid-template-columns: 90px 1fr; gap: 8px; }
+  table.controls td::before { content: attr(data-label); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); padding-top: 3px; }
+}
 #how > .wrap > .fine { margin-top: 12px; }
 
 .features {
@@ -230,7 +271,9 @@ table.controls tbody tr:last-child > * { border-bottom: 0; }
   padding: 20px; text-decoration: none; color: var(--text);
   transition: border-color 0.15s, transform 0.15s;
 }
-.link-card:hover { border-color: var(--gold); color: var(--text); transform: translateY(-2px); }
+.link-card:hover { border-color: var(--gold); color: var(--text); }
+@media (hover: hover) { .link-card:hover { transform: translateY(-2px); } }
+.link-card:active { border-color: var(--gold); }
 .link-name { font-weight: 600; font-size: 1.05rem; color: var(--gold); }
 .link-name::after { content: " ↗"; font-weight: 400; }
 .link-desc { font-size: 15px; color: var(--text-2); flex: 1; }
@@ -265,3 +308,4 @@ table.controls tbody tr:last-child > * { border-bottom: 0; }
 /* ── Footer ─────────────────────────────────────────────────────────── */
 .site-footer { border-top: 1px solid var(--border); padding: 32px 0 40px; background: var(--page-alt); }
 .footer-row { display: grid; gap: 8px; text-align: center; color: var(--text-2); font-size: 15px; }
+.site-footer { padding-bottom: max(40px, env(safe-area-inset-bottom)); }
